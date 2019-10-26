@@ -1,6 +1,6 @@
-from model_template import ObjectDetectionNet
+from ..model_template import ObjectDetectionNet
 
 
 class FasterRCNN(ObjectDetectionNet):
     # TODO: implement FasterRCNN
-    raise NotImplementedError()
+    def __init__(self): raise NotImplementedError()

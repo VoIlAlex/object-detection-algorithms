@@ -1,6 +1,6 @@
-from model_template import ObjectDetectionNet
+from ..model_template import ObjectDetectionNet
 
 
 class RCNN(ObjectDetectionNet):
     # TODO: implement RCNN
-    raise NotImplementedError()
+    def __init__(self): raise NotImplementedError()

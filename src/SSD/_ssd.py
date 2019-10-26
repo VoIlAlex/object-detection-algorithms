@@ -1,6 +1,6 @@
-from model_template import ObjectDetectionNet
+from ..model_template import ObjectDetectionNet
 
 
 class SSD(ObjectDetectionNet):
     # TODO: implement SSD
-    raise NotImplementedError()
+    def __init__(self): raise NotImplementedError()

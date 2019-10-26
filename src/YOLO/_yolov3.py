@@ -1,6 +1,6 @@
-from model_template import ObjectDetectionNet
+from ..model_template import ObjectDetectionNet
 
 
 class Yolov3(ObjectDetectionNet):
     # TODO: implement Yolov3
-    raise NotImplementedError()
+    def __init__(self): raise NotImplementedError()
