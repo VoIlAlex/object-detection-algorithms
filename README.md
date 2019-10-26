@@ -6,6 +6,22 @@ This repository contains my coursework research in field of neural networks. **I
 
 All the dependencies of the project are listed in [requirements.txt](requirements.txt). The project is build with help of **keras** deep learning framework.
 
+
+## Installation
+
+To install the project run the following command:
+```
+pip install -r requirement.txt
+```
+
+## Running
+
+The main research file is [main.py](main.py). It's kinda working area of the project.
+To run the script enter this in the terminal:
+```
+python main.py
+```
+
 ## Project structure
 
 Project structure should provide convenience of development process, scalability, separation of development parts.
@@ -20,6 +36,7 @@ Project structure should provide convenience of development process, scalability
 │   ├── my_pretrained 
 │   └── pretrained 
 └── src 
+    ├── !research
     ├── RCNN 
     ├── SSD 
     └── YOLO 
@@ -32,6 +49,7 @@ Project structure should provide convenience of development process, scalability
   * **my_pretrained** - weights of my models.
   * **pretrained** - third-party weights
 * **src** - sources of the project
+  * **!research** - folder for all the research scripts saved for demonstration.
   * **RCNN** - "region-based neural network" family.
   * **SSD** - "single shot detection" family.
   * **YOLO** - "you only look once" family.
