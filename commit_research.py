@@ -5,7 +5,7 @@ import re
 # line in main.py
 # by default.
 DEFAULT_MAIN = [
-    'from src.models import *'
+    'from src import *'
 ]
 
 

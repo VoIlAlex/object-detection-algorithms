@@ -75,14 +75,14 @@ The base class for all the networks is called `ObjectDetectionNet` from [model_t
 Structure of a family folder is as follows:
 ```
 <family_name>
-├── model.py
+├── __init__.py
 ├── _<family_member_1>.py
 ├── _<_family_member_2>.py
 └── ...
 ```
 
 where </br>
-`model.py` - file collector for all the members of a family.</br>
+`__init__.py` - file collector for all the members of a family.</br>
 `<family_name>` - RCNN, SSD or YOLO; </br>
 `<family_member>` - particular model of the family.
 
