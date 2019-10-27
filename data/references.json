@@ -1,0 +1,13 @@
+{
+    "coco": {
+        "train": {
+            "images": "/home/voilalex/Documents/coco/images/train2014",
+            "labels": "/home/voilalex/Documents/coco/labels/train2014"
+
+        },
+        "test": {
+            "images": "/home/voilalex/Documents/coco/images/val2014",
+            "labels": "/home/voilalex/Documents/coco/labels/val2014"
+        }
+    }
+}
