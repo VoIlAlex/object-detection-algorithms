@@ -1,5 +1,9 @@
 # Object detection algorithms
 
+[![codecov](https://codecov.io/gh/VoIlAlex/object-detection-algorithms/branch/master/graph/badge.svg?token=yFH2n7WtKe)](https://codecov.io/gh/VoIlAlex/object-detection-algorithms)
+![travis-ci](https://travis-ci.com/VoIlAlex/object-detection-algorithms.svg?token=tasqvqAdVwyCcJuhTntj&branch=master)
+
+
 This repository contains my coursework research in field of neural networks. **It's only aims studying purposes and isn't supposed to be used in commercial projects**.
 
 ## Dependencies
