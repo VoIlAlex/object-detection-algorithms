@@ -24,3 +24,6 @@ class TestImporting:
     def test_ssd_family_importing(self):
         assert hasattr(src, 'SSD')
 
+    def test_utils_importing(self):
+        assert hasattr(src, 'allow_MoyaPizama_constrains')
+        assert hasattr(src, 'MoyaPizama_specific_method')
