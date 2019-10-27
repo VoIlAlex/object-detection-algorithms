@@ -20,3 +20,7 @@ class TestImporting:
         assert hasattr(src, 'YOLO')
         assert hasattr(src, 'YOLOv2')
         assert hasattr(src, 'YOLOv3')
+
+    def test_ssd_family_importing(self):
+        assert hasattr(src, 'SSD')
+
