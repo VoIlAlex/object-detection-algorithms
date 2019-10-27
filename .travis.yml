@@ -9,4 +9,4 @@ install:
 script:
   - pytest
 env:
-  - CODECOV_TOKEN=4911e60c-8b5b-4b78-94b6-6c4ae1f7a74d
+  - CODECOV_TOKEN="4911e60c-8b5b-4b78-94b6-6c4ae1f7a74d"
