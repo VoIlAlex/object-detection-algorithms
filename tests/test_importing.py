@@ -15,3 +15,8 @@ class TestImporting:
         assert hasattr(src, 'RCNN')
         assert hasattr(src, 'FastRCNN')
         assert hasattr(src, 'FasterRCNN')
+
+    def test_yolo_family_importing(self):
+        assert hasattr(src, 'YOLO')
+        assert hasattr(src, 'YOLOv2')
+        assert hasattr(src, 'YOLOv3')
