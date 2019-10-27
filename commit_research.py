@@ -19,10 +19,17 @@ def extract_research_label(research_file_name: str):
 
 
 def commit_to_research(research_name: str = None):
-    research_dir_path = os.path.join('src', '!research')
+    internal_path, research_name = os.path.split(research_name)
+    if internal_path:
+        research_dir_path = os.path.join('src', '!research', internal_path)
+    else:
+        research_dir_path = os.path.join('src', '!research')
 
-    # create default research
-    # name if not given
+    if not os.path.exists(research_dir_path):
+        os.makedirs(research_dir_path)
+
+        # create default research
+        # name if not given
     if research_name == '':
         research_files = os.listdir(research_dir_path)
         max_research_label = 0
@@ -35,7 +42,7 @@ def commit_to_research(research_name: str = None):
     os.rename('main.py', research_name)
     shutil.move(
         src=research_name,
-        dst=os.path.join('src', '!research',)
+        dst=research_dir_path
     )
 
     # create a new main file
