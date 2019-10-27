@@ -1,3 +1,5 @@
 keras
 numpy
 matplotlib
+pytest
+pandas
