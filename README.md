@@ -36,6 +36,15 @@ python3 commit_research
 ```
 to commit the [main.py](main.py) file to the database of researches. The script will ask you to provide name of the research. You might not provide a research name. In that case it will name the research with default name.
 
+## Testing
+The tool use for testing this project is `pytest`.
+
+#### Running tests
+To run tests run the following command:
+```
+pytest
+```
+
 ## Project structure
 
 Project structure should provide convenience of development process, scalability, separation of development parts.
@@ -49,12 +58,14 @@ Project structure should provide convenience of development process, scalability
 ├── models 
 │   ├── my_pretrained 
 │   └── pretrained 
-└── src 
-    ├── !research
-    ├── RCNN 
-    ├── SSD 
-    ├── utils
-    └── YOLO 
+├── src 
+│   ├── !research
+│   ├── RCNN 
+│   ├── SSD 
+│   ├── utils
+│   └── YOLO 
+└── tests
+
 ```
 
 #### Folders overview
@@ -69,6 +80,7 @@ Project structure should provide convenience of development process, scalability
   * **SSD** - "single shot detection" family.
   * **utils** - utility functions for the research.
   * **YOLO** - "you only look once" family.
+* **tests** - testing code for the project.
 
 #### Base for all networks
 
