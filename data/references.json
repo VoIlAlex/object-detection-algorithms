@@ -8,6 +8,7 @@
         "test": {
             "images": "/home/voilalex/Documents/coco/images/val2014",
             "labels": "/home/voilalex/Documents/coco/labels/val2014"
-        }
+        },
+        "names": "/home/voilalex/Documents/coco/coco.names"
     }
 }

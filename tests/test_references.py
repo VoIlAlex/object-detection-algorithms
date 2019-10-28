@@ -23,3 +23,8 @@ class TestReferences:
     def test_coco_test(self):
         assert os.path.exists(DATASETS['coco']['test']['images'])
         assert os.path.exists(DATASETS['coco']['test']['labels'])
+
+    @MoyaPizama_specific_method
+    def test_coco_names(self):
+        assert os.path.exists(DATASETS['coco']['names'])
+        assert len(list(open(DATASETS['coco']['names']))) == 80
