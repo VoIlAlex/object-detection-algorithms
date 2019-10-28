@@ -4,3 +4,4 @@ matplotlib
 pytest
 pandas
 opencv-python
+tensorflow
