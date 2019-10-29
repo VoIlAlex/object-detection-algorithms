@@ -8,7 +8,7 @@ parent_dir = os.path.dirname(script_dir)
 sys.path.insert(0, parent_dir)
 
 
-from data.data_loading import CocoStyleDataGenerator
+from data.data_loading import *
 from src.utils.testutils import *
 from data.references import DATASETS
 
