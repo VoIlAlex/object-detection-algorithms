@@ -205,3 +205,16 @@ class TestDataLoading:
                 to_fit=False
             )
             X = test_generator[0]
+
+        @MoyaPizama_specific_method
+        def test_coco_test_batch_shape(self):
+            test_generator = CocoStyleDataGenerator(
+                images_dir=DATASETS['coco']['test']['images'],
+                labels_dir=DATASETS['coco']['test']['labels'],
+                names_path=DATASETS['coco']['names'],
+                image_shape=(448, 448, 3),
+                batch_size=32,
+                to_fit=False
+            )
+            X = test_generator[0]
+            assert X.shape == (32, 448, 448, 3)
