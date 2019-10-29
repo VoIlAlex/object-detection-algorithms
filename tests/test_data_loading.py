@@ -152,16 +152,19 @@ class TestDataLoading:
 
         assert isinstance(img, np.ndarray)
 
-    @MoyaPizama_specific_method
-    def test_coco_dataset_loading(self):
-        train_generator = CocoStyleDataGenerator(
-            images_dir=DATASETS['coco']['train']['images'],
-            labels_dir=DATASETS['coco']['train']['labels'],
-            names_path=DATASETS['coco']['names']
-        )
+    @allow_MoyaPizama_constrains
+    class TestCocoLoading:
 
-        test_generator = CocoStyleDataGenerator(
-            images_dir=DATASETS['coco']['test']['images'],
-            labels_dir=DATASETS['coco']['test']['labels'],
-            names_path=DATASETS['coco']['names']
-        )
+        @MoyaPizama_specific_method
+        def test_coco_dataset_loading(self):
+            train_generator = CocoStyleDataGenerator(
+                images_dir=DATASETS['coco']['train']['images'],
+                labels_dir=DATASETS['coco']['train']['labels'],
+                names_path=DATASETS['coco']['names']
+            )
+
+            test_generator = CocoStyleDataGenerator(
+                images_dir=DATASETS['coco']['test']['images'],
+                labels_dir=DATASETS['coco']['test']['labels'],
+                names_path=DATASETS['coco']['names']
+            )
