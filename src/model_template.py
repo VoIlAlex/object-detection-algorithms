@@ -3,7 +3,7 @@ class ObjectDetectionNet:
     def __init__(self):
         pass
 
-    def fit_generator(self, generator, validation_dataб):
+    def fit_generator(self, generator, validation_data):
         return self._model.fit_generator(
             generator=generator,
             validation_data=validation_data
