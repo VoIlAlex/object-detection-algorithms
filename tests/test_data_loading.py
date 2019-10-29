@@ -17,6 +17,7 @@ import numpy as np
 
 @allow_MoyaPizama_constrains
 class TestDataLoading:
+
     def test_name_parsing(self):
         result = CocoStyleDataGenerator._CocoStyleDataGenerator__parse_name(
             'COCO_train2014_000000000034.txt'
@@ -97,7 +98,7 @@ class TestDataLoading:
         assert label_names_result == expected_label_names_result
 
     @MoyaPizama_specific_method
-    def test_label_parsing(self):
+    def test_parse_class_and_bounding_box(self):
         test_generator = CocoStyleDataGenerator(
             images_dir=DATASETS['coco']['test']['images'],
             labels_dir=DATASETS['coco']['test']['labels'],
