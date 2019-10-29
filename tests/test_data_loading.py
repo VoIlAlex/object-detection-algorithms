@@ -139,7 +139,7 @@ class TestDataLoading:
         assert all(labels[2, 1:80] == 0)
 
     @MoyaPizama_specific_method
-    def test_image_parsing(self):
+    def test_default_image_parsing(self):
         test_generator = CocoStyleDataGenerator(
             images_dir=DATASETS['coco']['test']['images'],
             labels_dir=DATASETS['coco']['test']['labels'],
