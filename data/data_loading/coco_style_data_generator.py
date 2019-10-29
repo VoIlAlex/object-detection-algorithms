@@ -1,9 +1,23 @@
 import os
+import sys
 from keras.utils import Sequence
 import numpy as np
 import cv2
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
+
+
+# make root dir visible
+# for importing
+script_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(script_dir)
+sys.path.insert(0, parent_dir)
+
+# different types of
+# labels parsing
+from .label_parsing import LabelParser, DefaultLabelParser
+from .image_parsing import ImageParser, DefaultImageParser
+import src.config as cfg
 
 
 class CocoStyleDataGenerator(Sequence):
@@ -37,9 +51,12 @@ class CocoStyleDataGenerator(Sequence):
                  images_dir: str,
                  labels_dir: str,
                  names_path: str,
+                 image_shape: tuple = (448, 448, 3),
                  batch_size: int = 32,
                  to_fit: bool = True,
-                 shuffle: bool = True):
+                 shuffle: bool = True,
+                 label_parser: LabelParser = None,
+                 image_parser: ImageParser = None):
         """
 
         Arguments:
@@ -48,17 +65,30 @@ class CocoStyleDataGenerator(Sequence):
             names_path {str} -- directory with names of the dataset
 
         Keyword Arguments:
+            image_shape {tuple} -- shape to which image will be transformed (default: {(448, 448, 3)})
             batch_size {int} -- size of one data batch (default: {32})
             to_fit {bool} -- whether to return Y values too (default: {True})
             shuffle {bool} -- whether to shuffle the dataset after each epoch (default: {True})
+            label_parser {LabelParser} -- parser of labels for the generator
         """
         self._images_dir = images_dir
         self._labels_dir = labels_dir
+        self._image_shape = image_shape
         self._batch_size = batch_size
         self._to_fit = to_fit
         self._shuffle = shuffle
         self._names_path = names_path
         self._classes_count = len(list(open(names_path)))
+
+        # max number of bounding
+        # boxes in the image
+        self._max_bb_count = cfg.MAX_BB_COUNT
+
+        # the parsers might be
+        # customized.
+        self._label_parser = label_parser if label_parser else DefaultLabelParser()
+        self._image_parser = image_parser if image_parser else DefaultImageParser(
+            image_shape)
 
         image_names = os.listdir(images_dir)
         label_names = os.listdir(labels_dir)
@@ -110,19 +140,32 @@ class CocoStyleDataGenerator(Sequence):
             index * self._batch_size:(index + 1) * self._batch_size
         ]
 
-        X = []
+        X = None
         for idx in indexes:
             img = self.__parse_img(self._image_names[idx])
-            X.append(X)
+            if X is None:
+                # reshaping because
+                # it's only one image
+                # of the batch
+                X = np.expand_dims(img, axis=0)
+
+            else:
+                # add image to
+                # the batch
+                X = np.concatenate((X, np.expand_dims(img, axis=0)))
 
         if self._to_fit:
-            y = []
+            y = None
             for idx in indexes:
                 label = self.__parse_label(self._label_names[idx])
-                y.append(y)
-            return np.array(X), np.array(y)
+                if y is None:
+                    y = np.expand_dims(label, axis=0)
+                else:
+                    y = np.concatenate((y, np.expand_dims(label, axis=0)))
+
+            return X, y
         else:
-            return np.array(X)
+            return X
 
     def on_epoch_end(self):
         """
@@ -143,15 +186,14 @@ class CocoStyleDataGenerator(Sequence):
             np.ndarray -- array of pixels with channels last
         """
         image_path = os.path.join(self._images_dir, img_name)
-        img = cv2.imread(image_path)
+        img = self._image_parser.parse_image(image_path)
         return img
 
     def __parse_label(self, label_name: str) -> np.ndarray:
         """
             Parses label file with given name.
             Labels are stored in format:
-                <class_number> <x1> <y1> <x2> <y2>
-            # TODO: check the format. I'm not curtain about the format of label
+                <class_number> <x> <y> <w> <h>
 
         Arguments:
             label_name {str} -- name of the file with labels
@@ -160,32 +202,11 @@ class CocoStyleDataGenerator(Sequence):
             np.ndarray -- list of labels from file
         """
         label_path = os.path.join(self._labels_dir, label_name)
-        labels = []
-        with open(label_path) as label_file:
-            for line in label_file:
-                values_from_line = np.array(
-                    [float(value) for value in line.rstrip().split(' ')], dtype=object
-                )
-                values_from_line[0] = int(values_from_line[0])
-
-                # first value is categorical (class)
-                values_from_line.shape = (1, -1)
-                onehotencoder = OneHotEncoder(
-                    # categories=list(np.arange(self._classes_count))
-                    n_values=self._classes_count,
-                    sparse=False
-                )
-                column_transformer = ColumnTransformer(
-                    [('onehotencoder', onehotencoder, [0])],
-                    remainder='passthrough'  # non-categorical columns pass through
-                )
-                values_from_line = column_transformer.fit_transform(
-                    values_from_line)
-                values_from_line.shape = (-1,)
-
-                # save parsed value
-                labels.append(values_from_line)
-        return np.array(labels)
+        label = self._label_parser.parse_label(
+            label_path=label_path,
+            classes_count=self._classes_count,
+            max_bb_count=self._max_bb_count)
+        return label
 
     @staticmethod
     def __parse_name(name):
