@@ -108,8 +108,12 @@ class TestDataLoading:
         # I chose the file
         # randomly from the
         # dataset
-        labels = test_generator._CocoStyleDataGenerator__parse_label(
-            'COCO_val2014_000000578655.txt'
+        labels = parse_class_and_bounding_box(
+            label_path=os.path.join(
+                test_generator._labels_dir,
+                'COCO_val2014_000000578655.txt'
+            ),
+            classes_count=80
         )
 
         # 3 object detected
