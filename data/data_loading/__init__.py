@@ -7,6 +7,7 @@ from .label_parsing import parse_class_and_bounding_box
 # label parsers
 from .label_parsing import LabelParser
 from .label_parsing import DefaultLabelParser
+from .label_parsing import ClassificationLabelParser
 
 # image parsers
 from .image_parsing import ImageParser
