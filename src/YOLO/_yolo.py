@@ -177,3 +177,14 @@ class YOLO_keras(ObjectDetectionNet):
 
         # call parent constructor
         ObjectDetectionNet.__init__(self)
+
+
+# Choosing an implementation
+if FRAMEWORK_TO_USE == 'keras':
+    YOLO = YOLO_keras
+elif FRAMEWORK_TO_USE == 'pytorch':
+    YOLO = YOLO_pytorch
+elif FRAMEWORK_TO_USE == 'tensorflow':
+    YOLO = YOLO_tensorflow
+elif FRAMEWORK_TO_USE == 'theano':
+    YOLO = YOLO_theano
