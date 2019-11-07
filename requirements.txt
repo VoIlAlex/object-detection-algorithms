@@ -6,3 +6,5 @@ pandas
 opencv-python
 sklearn
 tensorflow
+torch
+torchvision
