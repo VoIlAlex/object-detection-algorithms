@@ -1,202 +1,100 @@
-import sys
-import os
-
 from src import *
 from data.references import DATASETS
-from pytorch_modelsize import SizeEstimator
+import src.config as cfg
+import os
+import sys
 
-import torch.nn as nn
-from torch.functional import F
-
-# Layers of the YOLO networks
-
-
-def get_L1():
-    return nn.Conv2d(
-        in_channels=3,
-        out_channels=64,
-        kernel_size=(7, 7),
-        stride=2
-    )
+import torch
+import torchvision
+import torchvision.transforms as transforms
 
 
-def get_L2():
-    return nn.MaxPool2d(
-        kernel_size=(2, 2),
-        stride=2
-    )
-
-
-def get_L3():
-    return nn.Conv2d(
-        in_channels=64,
-        out_channels=192,
-        kernel_size=(3, 3)
-    )
-
-
-def get_L4():
-    return nn.MaxPool2d(
-        kernel_size=(2, 2),
-        stride=2
-    )
-
-
-def get_L5():
-    return nn.Conv2d(
-        in_channels=192,
-        out_channels=128,
-        kernel_size=(1, 1)
-    )
-
-
-def get_L6():
-    return nn.Conv2d(
-        in_channels=128,
-        out_channels=256,
-        kernel_size=(3, 3)
-    )
-
-
-def get_L7():
-    return nn.Conv2d(
-        in_channels=256,
-        out_channels=256,
-        kernel_size=(1, 1)
-    )
-
-
-def get_L8():
-    return nn.Conv2d(
-        in_channels=256,
-        out_channels=512,
-        kernel_size=(3, 3)
-    )
-
-
-def get_L9():
-    return nn.MaxPool2d(
-        kernel_size=(2, 2),
-        stride=2
-    )
-
-
-def get_L10():
-    return nn.Conv2d(
-        in_channels=512,
-        out_channels=256,
-        kernel_size=(1, 1)
-    )
-
-
-def get_L11():
-    return nn.Conv2d(
-        in_channels=256,
-        out_channels=512,
-        kernel_size=(3, 3)
-    )
-
-
-def get_L12():
-    return nn.Conv2d(
-        in_channels=512,
-        out_channels=512,
-        kernel_size=(1, 1)
-    )
-
-
-def get_L13():
-    return nn.Conv2d(
-        in_channels=512,
-        out_channels=1024,
-        kernel_size=(3, 3)
-    )
-
-
-def get_L14():
-    return nn.MaxPool2d(
-        kernel_size=(2, 2),
-        stride=2
-    )
-
-
-def get_L15():
-    return nn.Conv2d(
-        in_channels=1024,
-        out_channels=512,
-        kernel_size=(1, 1)
-    )
-
-
-def get_L16():
-    return nn.Conv2d(
-        in_channels=512,
-        out_channels=1024,
-        kernel_size=(3, 3)
-    )
-
-
-def get_L17():
-    return nn.Conv2d(
-        in_channels=1024,
-        out_channels=1024,
-        kernel_size=(3, 3)
-    )
-
-
-def get_L18():
-    return nn.Conv2d(
-        in_channels=1024,
-        out_channels=1024,
-        kernel_size=(3, 3),
-        stride=2
-    )
-
-
-def get_L19():
-    return nn.Conv2d(
-        in_channels=1024,
-        out_channels=1024,
-        kernel_size=(3, 3)
-    )
-
-
-def get_L20():
-    return nn.Conv2d(
-        in_channels=1024,
-        out_channels=1024,
-        kernel_size=(3, 3)
-    )
-
-
-def get_L21():
-    return nn.Linear(
-        in_features=50176,
-        out_features=4096
-    )
-
-
-def get_L22():
-    return nn.Linear(
-        in_features=4096,
-        out_features=1470
-    )
+# name for model file and log file
+MODEL_NAME = 'CIFAR100_MobileNetV2_500_32_SGD_CrossEntropyLoss'
+MODEL_FILE_PATH = os.path.join(
+    cfg.MY_PRETRAINED_MODELS_PATH,
+    MODEL_NAME + '.pth'
+)
+MODEL_TRAIN_OUTPUT_PATH = os.path.join(
+    cfg.MY_PRETRAINED_MODELS_PATH,
+    MODEL_NAME + '.log'
+)
+MODEL_TRAIN_ERRORS_PATH = os.path.join(
+    cfg.MY_PRETRAINED_MODELS_PATH,
+    MODEL_NAME + '_errors.log'
+)
 
 
 if __name__ == "__main__":
-    # Don't show errors and warnings
-    # (because it's kinda annoying)
-    sys.stderr = open(os.devnull, 'w')
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(
+            mean=(0.485, 0.456, 0.406),
+            std=(0.229, 0.224, 0.225)
+        )
+    ])
 
-    # Layer to examine
-    net = get_L1()
+    trainset = torchvision.datasets.CIFAR100(root='./data/datasets', train=True,
+                                             download=True, transform=transform)
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=32,
+                                              shuffle=True, num_workers=2)
+    testset = torchvision.datasets.CIFAR100(root='./data/datasets', train=False,
+                                            download=True, transform=transform)
+    testloader = torch.utils.data.DataLoader(testset, batch_size=32,
+                                             shuffle=False, num_workers=2)
 
-    # Estimate parameters number
-    pytorch_total_params = sum(p.numel()
-                               for p in net.parameters() if p.requires_grad)
+    net = torchvision.models.MobileNetV2(num_classes=100).cuda()
 
-    # Estimate size
-    se = SizeEstimator(net, input_size=(1, 3, 448, 448))
-    # Visualize the results
-    print('Size of the layer in megabytes: {}'.format(se.estimate_size()[0]))
-    print('Number of parameters: {}'.format(pytorch_total_params))
+    optimizer = torch.optim.SGD(
+        params=net.parameters(),
+        lr=0.001,
+        momentum=0.9
+    )
+    criterion = torch.nn.CrossEntropyLoss()
+
+    # redirect outputs to
+    # the log files
+    sys.stdout = open(MODEL_TRAIN_OUTPUT_PATH, 'w+')
+    sys.stderr = open(MODEL_TRAIN_ERRORS_PATH, 'w+')
+
+    # save the model meta-info
+    print(net)
+    print(optimizer)
+    print(criterion)
+
+    for epoch in range(500):
+        running_loss = 0.0
+        for i, (X, y) in enumerate(trainloader):
+
+            # move data to the GPU
+            X = X.cuda()
+            y = y.cuda()
+
+            # zero the parameter grads
+            optimizer.zero_grad()
+
+            # predict
+            y_pred = net(X).cuda()
+
+            # backward the loss
+            loss = criterion(y_pred, y)
+            loss.backward()
+
+            # optimize paramters
+            optimizer.step()
+
+            running_loss += loss
+            if i % 99 == 0:
+                print('[{:6} {:6}] - loss: {}'.format(
+                    epoch + 1,
+                    i + 1,
+                    running_loss
+                ))
+                sys.stdout.flush()
+                running_loss = 0.0
+
+        # save the model
+        torch.save(
+            obj=net.state_dict(),
+            f=MODEL_FILE_PATH
+        )
