@@ -27,7 +27,7 @@ class YOLO_keras(ObjectDetectionNet):
 
         # 1st block of the scheme
         self._model.add(Conv2D(
-            filters=192,
+            filters=64,
             kernel_size=(7, 7),
             strides=(2, 2),
             activation='relu'
@@ -39,7 +39,7 @@ class YOLO_keras(ObjectDetectionNet):
 
         # 2nd block of the scheme
         self._model.add(Conv2D(
-            filters=256,
+            filters=192,
             kernel_size=(3, 3),
             activation='relu'
         ))
@@ -88,6 +88,13 @@ class YOLO_keras(ObjectDetectionNet):
             ))
         self._model.add(Conv2D(
             filters=512,
+            kernel_size=(1, 1),
+            activation='relu'
+        ))
+
+        self._model.add(ZeroPadding2D((1, 1)))
+        self._model.add(Conv2D(
+            filters=1024,
             kernel_size=(3, 3),
             activation='relu'
         ))
