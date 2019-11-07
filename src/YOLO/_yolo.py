@@ -31,6 +31,7 @@ class YOLO_keras(ObjectDetectionNet):
         self._model = Sequential()
 
         # 1st block of the scheme
+        self._model.add(ZeroPadding2D((3, 3)))
         self._model.add(Conv2D(
             filters=64,
             kernel_size=(7, 7),
@@ -43,6 +44,7 @@ class YOLO_keras(ObjectDetectionNet):
         ))
 
         # 2nd block of the scheme
+        self._model.add(ZeroPadding2D((1, 1)))
         self._model.add(Conv2D(
             filters=192,
             kernel_size=(3, 3),
@@ -59,6 +61,8 @@ class YOLO_keras(ObjectDetectionNet):
             kernel_size=(1, 1),
             activation='relu'
         ))
+
+        self._model.add(ZeroPadding2D((1, 1)))
         self._model.add(Conv2D(
             filters=256,
             kernel_size=(3, 3),
@@ -69,6 +73,8 @@ class YOLO_keras(ObjectDetectionNet):
             kernel_size=(1, 1),
             activation='relu'
         ))
+
+        self._model.add(ZeroPadding2D((1, 1)))
         self._model.add(Conv2D(
             filters=512,
             kernel_size=(3, 3),
@@ -86,11 +92,13 @@ class YOLO_keras(ObjectDetectionNet):
                 kernel_size=(1, 1),
                 activation='relu'
             ))
+            self._model.add(ZeroPadding2D((1, 1)))
             self._model.add(Conv2D(
                 filters=512,
                 kernel_size=(3, 3),
                 activation='relu'
             ))
+
         self._model.add(Conv2D(
             filters=512,
             kernel_size=(1, 1),
@@ -103,6 +111,7 @@ class YOLO_keras(ObjectDetectionNet):
             kernel_size=(3, 3),
             activation='relu'
         ))
+
         self._model.add(MaxPool2D(
             pool_size=(2, 2),
             strides=(2, 2)
@@ -115,16 +124,20 @@ class YOLO_keras(ObjectDetectionNet):
                 kernel_size=(1, 1),
                 activation='relu'
             ))
+            self._model.add(ZeroPadding2D((1, 1)))
             self._model.add(Conv2D(
                 filters=1024,
                 kernel_size=(3, 3),
                 activation='relu'
             ))
+        self._model.add(ZeroPadding2D((1, 1)))
         self._model.add(Conv2D(
             filters=1024,
             kernel_size=(3, 3),
             activation='relu'
         ))
+
+        self._model.add(ZeroPadding2D((1, 1)))
         self._model.add(Conv2D(
             filters=1024,
             kernel_size=(3, 3),
@@ -133,11 +146,13 @@ class YOLO_keras(ObjectDetectionNet):
         ))
 
         # 6th block of the scheme
+        self._model.add(ZeroPadding2D((1, 1)))
         self._model.add(Conv2D(
             filters=1024,
             kernel_size=(3, 3),
             activation='relu'
         ))
+        self._model.add(ZeroPadding2D((1, 1)))
         self._model.add(Conv2D(
             filters=1024,
             kernel_size=(3, 3),
