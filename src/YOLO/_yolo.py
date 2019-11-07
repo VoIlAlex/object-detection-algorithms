@@ -1,15 +1,20 @@
 from ..model_template import ObjectDetectionNet
+from ..config import FRAMEWORK_TO_USE, IMPORT_ALL
 
-# Choosing an implementation
-YOLO = YOLO_keras
 
 # NN specific modules
-if YOLO == YOLO_keras:
+if FRAMEWORK_TO_USE == 'keras' or IMPORT_ALL:
     from keras.models import Sequential
     from keras.layers import Conv2D, Dense, Flatten, MaxPool2D, Reshape, Activation
     from keras.metrics import Accuracy
     from keras.optimizers import SGD
     from keras.losses import MSE
+
+if FRAMEWORK_TO_USE == 'pytorch' or IMPORT_ALL:
+    import torch
+    import torch.nn as nn
+    from torch.functional import F
+
 
 ###################
 # Implementations #
