@@ -181,3 +181,22 @@ def get_L22():
         in_features=4096,
         out_features=1470
     )
+
+
+if __name__ == "__main__":
+    # Don't show errors and warnings
+    # (because it's kinda annoying)
+    sys.stderr = open(os.devnull, 'w')
+
+    # Layer to examine
+    net = get_L1()
+
+    # Estimate parameters number
+    pytorch_total_params = sum(p.numel()
+                               for p in net.parameters() if p.requires_grad)
+
+    # Estimate size
+    se = SizeEstimator(net, input_size=(1, 3, 448, 448))
+    # Visualize the results
+    print('Size of the layer in megabytes: {}'.format(se.estimate_size()[0]))
+    print('Number of parameters: {}'.format(pytorch_total_params))
