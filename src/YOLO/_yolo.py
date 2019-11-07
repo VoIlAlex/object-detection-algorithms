@@ -1,3 +1,8 @@
+"""
+    See model selection in
+    the end of this module.
+"""
+
 from ..model_template import ObjectDetectionNet
 from ..config import FRAMEWORK_TO_USE, IMPORT_ALL
 
