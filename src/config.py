@@ -5,3 +5,18 @@ BOXES_PER_CELL = 2  # number of boxes per cell
 # This constant is used
 # throughout label parsing
 MAX_BB_COUNT = 100  # max count of bounding boxes
+
+
+FRAMEWORK_TO_USE = 'pytorch'
+
+
+# line in main.py
+# by default.
+DEFAULT_MAIN = [
+    'from src import *',
+    'from data.references import DATASETS',
+    ''
+]
+
+# path to main script
+MAIN_PATH = 'main.py'
