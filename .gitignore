@@ -1,5 +1,16 @@
+# IDEs
 .vscode/
 .idea/
+
+# Python
 .pytest_cache/
-*.weights
 __pycache__/
+
+# Data
+*.weights
+*.pth
+data/
+!data/data_loading/
+!data/references.json
+!data/references.py
+!data/config/
