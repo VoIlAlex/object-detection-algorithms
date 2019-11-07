@@ -20,3 +20,9 @@ DEFAULT_MAIN = [
 
 # path to main script
 MAIN_PATH = 'main.py'
+
+# whether to import
+# all the modules or
+# import only modules for
+# chosen implementation
+IMPORT_ALL = True
