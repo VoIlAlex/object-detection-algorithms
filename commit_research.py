@@ -1,12 +1,7 @@
 import os
 import shutil
 import re
-
-# line in main.py
-# by default.
-DEFAULT_MAIN = [
-    'from src import *'
-]
+from src.config import DEFAULT_MAIN
 
 
 def extract_research_label(research_file_name: str):
@@ -55,7 +50,7 @@ if __name__ == "__main__":
     # Run the script until
     # we get correct input
     while(True):
-        answer = input('Do you really want to commit? [y/n]')
+        answer = input('Do you really want to commit? [y/n] ')
         if answer == 'y':
             research_name = input(
                 'Enter research name (nothing for default): ')
