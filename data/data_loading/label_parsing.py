@@ -7,7 +7,7 @@ from sklearn.compose import ColumnTransformer
 import numpy as np
 
 
-def parse_class_and_bounding_box(label_path: str, classes_count: int):
+def parse_class_and_bounding_box(label_path: str, classes_count: int = None, one_hot_encoding: bool = True):
     """
         Parses label file with given name.
         Labels are stored in format:
@@ -32,19 +32,20 @@ def parse_class_and_bounding_box(label_path: str, classes_count: int):
             values_from_line[0] = int(values_from_line[0])
 
             # first value is categorical (class)
-            values_from_line.shape = (1, -1)
-            onehotencoder = OneHotEncoder(
-                # categories=list(np.arange(self._classes_count))
-                n_values=classes_count,
-                sparse=False
-            )
-            column_transformer = ColumnTransformer(
-                [('onehotencoder', onehotencoder, [0])],
-                remainder='passthrough'  # non-categorical columns pass through
-            )
-            values_from_line = column_transformer.fit_transform(
-                values_from_line)
-            values_from_line.shape = (-1,)
+            if one_hot_encoding is True:
+                values_from_line.shape = (1, -1)
+                onehotencoder = OneHotEncoder(
+                    # categories=list(np.arange(self._classes_count))
+                    n_values=classes_count,
+                    sparse=False
+                )
+                column_transformer = ColumnTransformer(
+                    [('onehotencoder', onehotencoder, [0])],
+                    remainder='passthrough'  # non-categorical columns pass through
+                )
+                values_from_line = column_transformer.fit_transform(
+                    values_from_line)
+                values_from_line.shape = (-1,)
 
             # save parsed value
             labels.append(values_from_line)
@@ -117,6 +118,13 @@ class DefaultLabelParser(LabelParser):
                 result_labels = np.concatenate((result_labels, label))
             i += 1
 
+        # add extra boxes
+        # why would I do that???
+        # just because I haven't
+        # found anything smarter.
+        # For now I have no idea how to
+        # make YOLO with arbitrary
+        # output size.
         if i != max_bb_count:
             extra_labels = np.ones(shape=(max_bb_count - i, classes_count + 4))
             if result_labels is None:
@@ -124,4 +132,40 @@ class DefaultLabelParser(LabelParser):
             else:
                 result_labels = np.concatenate((result_labels, extra_labels))
 
-        return result_labels
+        return result_labels.astype('float')
+
+
+class ClassificationLabelParser(LabelParser):
+    """ 
+        Parse labels for classification.
+        Does not consider bouding box at all. 
+    """
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
+    # ! This class is deprecated.    ! #
+    # ! Use it only for fun          ! #
+    # ! It's a dataset for detection ! #
+    # ! not for classification       ! #
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
+
+    def __init__(self):
+        # call the parent constructor
+        LabelParser.__init__(self)
+
+    def parse_label(self, label_path: str, classes_count: int, max_bb_count: int):
+        """Parses label into NN compatible format.
+
+        Arguments:
+            label_path {str} -- path to the label file
+            classes_count {int} -- count of the classes of dataset
+            max_bb_count {int} -- maximum count of bounding boxes in image 
+
+        Returns:
+            np.ndarray -- array of labels of objects on the image
+        """
+        labels = parse_class_and_bounding_box(
+            label_path=label_path,
+            classes_count=classes_count,
+            one_hot_encoding=False
+        )
+
+        return labels[0, 0]
