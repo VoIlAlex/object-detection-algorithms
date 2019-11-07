@@ -160,13 +160,14 @@ class YOLO_keras(ObjectDetectionNet):
         ))
 
         # 7th block of the scheme
+        self._model.add(Flatten())
         self._model.add(Dense(4096))
 
-        # last layer
-        self._model.add(Dense(100 * 84))
+        # 8 block of the scheme
+        self._model.add(Dense(30 * 7 * 7))
         self._model.add(Activation('softmax'))
         self._model.add(Reshape(
-            target_shape=(100, 84)
+            target_shape=(30, 7, 7)
         ))
 
         self._model.compile(
