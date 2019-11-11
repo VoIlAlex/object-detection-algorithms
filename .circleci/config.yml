@@ -9,6 +9,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: "Install Python"
+          command: choco install python --version=3.7.6
+      - run:
           name: "Install project dependencies"
           command: pip install -r requirements.txt
       - run:
