@@ -1,0 +1,16 @@
+version: 2
+
+orbs:
+  win: circleci/windows@1.0.0
+
+jobs:
+  build:
+    executor: win/vs2019
+    steps:
+      - checkout
+      - run:
+          name: "Install project dependencies"
+          command: pip install -r requirements.txt
+      - run:
+          name: "Run Python tests"
+          command: pytest
