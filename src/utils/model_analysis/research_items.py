@@ -50,7 +50,7 @@ class CurrentIterationItem(ResearchItem):
                 epoch, iteration), file=f, end=print_end)
 
 
-class AccuracyItem(ResearchItem):
+class AccuracyPrintItem(ResearchItem):
     def __init__(self, *args, **kwargs):
         self._args = args
         self._kwargs = kwargs
