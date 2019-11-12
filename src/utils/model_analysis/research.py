@@ -84,7 +84,8 @@ class ModelResearch(Research):
         network_output = {
             'iteration': None,
             'epoch': None,
-            'accuracy': None,
+            'accuracy_train': None,
+            'accuracy_test': None,
             'loss_train': None,
             'loss_test': None,
             'model': self._model,

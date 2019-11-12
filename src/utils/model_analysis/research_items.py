@@ -13,6 +13,10 @@ class ResearchItem:
             'by all the childs of ResearchItem class'
         )
 
+    def final_action(self, research_path, *args, **kwargs):
+        # TODO: Add final action support for items
+        None
+
 
 class CurrentIterationItem(ResearchItem):
     def __init__(self, *args, **kwargs):
@@ -31,8 +35,8 @@ class CurrentIterationItem(ResearchItem):
         iteration_modulo = self._kwargs.get('iteration_modulo', 1)
 
         # framework provided arguments
-        epoch = kwargs.get('epoch', None)
-        iteration = kwargs.get('iteration', None)
+        epoch = kwargs.get('epoch', -1)
+        iteration = kwargs.get('iteration', -1)
 
         # get out if necessary
         if iteration % iteration_modulo != 0:
@@ -46,7 +50,7 @@ class CurrentIterationItem(ResearchItem):
 
         # write item to the file
         with open(file_path, 'a') as f:
-            print('[{:5d}{:5d}] '.format(
+            print('Iteration: [{:6d},{:6d}]'.format(
                 epoch, iteration), file=f, end=print_end)
 
 
@@ -67,9 +71,11 @@ class AccuracyPrintItem(ResearchItem):
         iteration_modulo = self._kwargs.get('iteration_modulo', 1)
 
         # framework provided arguments
-        iteration = kwargs.get('iteration', None)
-        accuracy = kwargs.get('accuracy', None)
+        iteration = kwargs.get('iteration', -1)
+        accuracy_train = kwargs.get('accuracy_train', -1)
+        accuracy_test = kwargs.get('accuracy_test', -1)
 
+        # TODO: use absolute iteration
         # get out if necessary
         if iteration % iteration_modulo != 0:
             return
@@ -82,7 +88,7 @@ class AccuracyPrintItem(ResearchItem):
 
         # write item to the file
         with open(file_path, 'a') as f:
-            print('Accuracy: {:.5f} '.format(accuracy),
+            print('Accuracy: [{:6.2f},{:6.2f}] '.format(accuracy_train, accuracy_test),
                   file=f,
                   end=print_end)
 
@@ -104,8 +110,9 @@ class LossPrintItem(ResearchItem):
         iteration_modulo = self._kwargs.get('iteration_modulo', 1)
 
         # framework provided arguments
-        iteration = kwargs.get('iteration', None)
-        loss = kwargs.get('loss_train', None)
+        iteration = kwargs.get('iteration', -1)
+        loss_train = kwargs.get('loss_train', None)
+        loss_test = kwargs.get('loss_test', None)
 
         # get out if necessary
         if iteration % iteration_modulo != 0:
@@ -119,7 +126,7 @@ class LossPrintItem(ResearchItem):
 
         # write item to the file
         with open(file_path, 'a') as f:
-            print('Loss: {:.5f} '.format(loss),
+            print('Loss: [{:6.2f},{:6.2f}] '.format(loss_train, loss_test),
                   file=f,
                   end=print_end)
 
@@ -148,9 +155,9 @@ class LossVisualizationItem(ResearchItem):
         iteration_modulo = self._kwargs.get('iteration_modulo', 1)
 
         # framework provided arguments
-        iteration = kwargs.get('iteration', None)
+        iteration = kwargs.get('iteration', -1)
         iterations_per_epoch = kwargs.get('iterations_per_epoch', None)
-        epoch = kwargs.get('epoch', None)
+        epoch = kwargs.get('epoch', -1)
         loss_train = kwargs.get('loss_train', None)
         loss_test = kwargs.get('loss_test', None)
 
