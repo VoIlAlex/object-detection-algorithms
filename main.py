@@ -8,24 +8,22 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 
+# class for model folder path generation
+from src.utils.path_generation import ModelPathGenerator
 
-# name for model file and log file
-MODEL_NAME = 'CIFAR100_MobileNetV2_500_32_SGD_CrossEntropyLoss'
-MODEL_FILE_PATH = os.path.join(
-    cfg.MY_PRETRAINED_MODELS_PATH,
-    MODEL_NAME + '.pth'
-)
-MODEL_TRAIN_OUTPUT_PATH = os.path.join(
-    cfg.MY_PRETRAINED_MODELS_PATH,
-    MODEL_NAME + '.log'
-)
-MODEL_TRAIN_ERRORS_PATH = os.path.join(
-    cfg.MY_PRETRAINED_MODELS_PATH,
-    MODEL_NAME + '_errors.log'
-)
+# Import default research
+from src.utils.model_analysis import ModelResearch
 
+# Import research items
+from src.utils.model_analysis import LossPrintItem
+from src.utils.model_analysis import LossVisualizationItem
+from src.utils.model_analysis import CurrentIterationItem
+from src.utils.model_analysis import ModelConfigurationItem
+
+EPOCHS_COUNT = 100
 
 if __name__ == "__main__":
+    # model, dataset, loss, optimizer
     transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize(
@@ -52,49 +50,32 @@ if __name__ == "__main__":
     )
     criterion = torch.nn.CrossEntropyLoss()
 
-    # redirect outputs to
-    # the log files
-    sys.stdout = open(MODEL_TRAIN_OUTPUT_PATH, 'w+')
-    sys.stderr = open(MODEL_TRAIN_ERRORS_PATH, 'w+')
+    # generate path
+    path_generator = ModelPathGenerator(
+        root_path=cfg.MY_PRETRAINED_MODELS_PATH
+    )
+    path = path_generator.generate_path(
+        model=net,
+        optimizer=optimizer,
+        criterion=criterion,
+        epochs=EPOCHS_COUNT,
+        dataset_name='CIFAR100',
+        makedirs=True
+    )
 
-    # save the model meta-info
-    print(net)
-    print(optimizer)
-    print(criterion)
+    # research
+    research = ModelResearch(
+        research_path=path,
+        research_scheme=[
+            ModelConfigurationItem(),
+            CurrentIterationItem(print_end=' ', iteration_modulo=10),
+            LossPrintItem(iteration_modulo=10),
+            LossVisualizationItem(iteration_modulo=10)
+        ],
+        model=net,
+        optimizer=optimizer,
+        criterion=criterion
+    )
 
-    for epoch in range(500):
-        running_loss = 0.0
-        for i, (X, y) in enumerate(trainloader):
-
-            # move data to the GPU
-            X = X.cuda()
-            y = y.cuda()
-
-            # zero the parameter grads
-            optimizer.zero_grad()
-
-            # predict
-            y_pred = net(X).cuda()
-
-            # backward the loss
-            loss = criterion(y_pred, y)
-            loss.backward()
-
-            # optimize paramters
-            optimizer.step()
-
-            running_loss += loss
-            if i % 99 == 0:
-                print('[{:6} {:6}] - loss: {}'.format(
-                    epoch + 1,
-                    i + 1,
-                    running_loss
-                ))
-                sys.stdout.flush()
-                running_loss = 0.0
-
-        # save the model
-        torch.save(
-            obj=net.state_dict(),
-            f=MODEL_FILE_PATH
-        )
+    research.start_research_session(
+        trainloader, testloader, epochs=EPOCHS_COUNT, iteration_modulo=50)
