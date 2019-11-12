@@ -105,7 +105,7 @@ class LossPrintItem(ResearchItem):
 
         # framework provided arguments
         iteration = kwargs.get('iteration', None)
-        loss = kwargs.get('loss', None)
+        loss = kwargs.get('loss_train', None)
 
         # get out if necessary
         if iteration % iteration_modulo != 0:
@@ -132,6 +132,10 @@ class LossVisualizationItem(ResearchItem):
             {
                 'name': 'train',
                 'color': 'r'
+            },
+            {
+                'name': 'test',
+                'color': 'b'
             }
         ]
         self._visualizer = Visualizer(func_descriptors, 'Iterations', 'Loss')
@@ -145,18 +149,28 @@ class LossVisualizationItem(ResearchItem):
 
         # framework provided arguments
         iteration = kwargs.get('iteration', None)
+        iterations_per_epoch = kwargs.get('iterations_per_epoch', None)
         epoch = kwargs.get('epoch', None)
-        loss = kwargs.get('loss', None)
+        loss_train = kwargs.get('loss_train', None)
+        loss_test = kwargs.get('loss_test', None)
 
         # convert the loss
         # to the right format
-        loss = loss.cpu().detach().numpy()
+        loss_train = loss_train.cpu().detach().numpy()
+        loss_test = loss_test.cpu().detach().numpy()
+
+        # absolute iteration
+        x_pos = iterations_per_epoch * epoch + iteration
 
         if iteration % iteration_modulo == 0:
             self._visualizer.update({
                 'train': {
-                    'x': iteration,
-                    'y': loss
+                    'x': x_pos,
+                    'y': loss_train
+                },
+                'test': {
+                    'x': x_pos,
+                    'y': loss_test
                 }
             })
         self._visualizer.redraw()
