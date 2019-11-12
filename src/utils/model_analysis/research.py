@@ -52,10 +52,24 @@ class ModelResearch(Research):
         internal_path = os.path.join(self._research_path, 'model_init.pth')
         torch.save(self._model.state_dict(), internal_path)
 
-    def start_research_session(self, train_dataloader, test_dataloader=None, epochs=1):
-        # This dict will be
-        # sent to the research
-        # items in the research scheme
+    def start_research_session(self, train_dataloader, test_dataloader=None, epochs=1, iteration_modulo=None):
+        """
+
+        Arguments:
+            train_dataloader {} -- 
+
+        Keyword Arguments:
+            test_dataloader {} --  (default: {None})
+            epochs {} --  (default: {1})
+            iteration_modulo {} -- per give count of iterations research items will be called
+        """
+
+        # update iteration modulo if needed
+        if iteration_modulo is not None:
+            for item in self._research_scheme:
+                item._kwargs['iteration_modulo'] = 1
+        else:
+            iteration_modulo = 1
 
         # clear report files
         for item in self._research_scheme:
@@ -64,56 +78,81 @@ class ModelResearch(Research):
             if os.path.exists(report_path):
                 open(report_path, 'w').close()
 
-        # output to be passed
-        # to the research items
+        # This dict will be
+        # sent to the research
+        # items in the research scheme
         network_output = {
             'iteration': None,
             'epoch': None,
             'accuracy': None,
-            'loss': None,
+            'loss_train': None,
+            'loss_test': None,
             'model': self._model,
             'optimizer': self._optimizer,
             'criterion': self._criterion,
             'input': None,
             'output': None,
-            'expected_output': None
+            'expected_output': None,
+            'iterations_per_epoch': min(len(train_dataloader), len(test_dataloader))
         }
 
         # Main cycle
-        # TODO: Add test dataloader
+        running_loss_train = 0.0
+        running_loss_test = 0.0
+        # TODO: test dataloader has fewer number of samples than train dataloader
         for epoch in range(epochs):
-            for i, (X, y) in enumerate(train_dataloader):
+            for i, ((X_train, y_train), (X_test, y_test)) in enumerate(zip(train_dataloader, test_dataloader)):
                 network_output['iteration'] = i
                 network_output['epoch'] = epoch
-                network_output['input'] = X
-                network_output['expected_output'] = y
+                network_output['input'] = X_train
+                network_output['expected_output'] = y_train
                 # if using cuda
                 if self._use_cuda:
-                    X = X.cuda()
-                    y = y.cuda()
+                    X_train = X_train.cuda()
+                    y_train = y_train.cuda()
+                    X_test = X_test.cuda()
+                    y_test = y_test.cuda()
 
                 # zero gradients of the parameters
                 self._optimizer.zero_grad()
 
                 # calculate the loss
-                y_pred = self._model(X)
+                y_pred = self._model(X_train)
+                y_pred_test = self._model(X_test)
 
                 if self._use_cuda:
                     y_pred = y_pred.cuda()
+                    y_pred_test = y_pred_test.cuda()
 
                 network_output['output'] = y_pred
-                loss = self._criterion(y_pred, y)
-                network_output['loss'] = loss
+
+                loss_train = self._criterion(y_pred, y_train)
+                loss_test = self._criterion(y_pred_test, y_test)
+
+                running_loss_train += loss_train
+                running_loss_test += loss_test
 
                 # backward propagation
-                loss.backward()
+                loss_train.backward()
 
                 # parameters optimization
                 self._optimizer.step()
 
-                # write to the report file
-                for item in self._research_scheme:
-                    item.print(self._research_path, **network_output)
+                # absolute iteration
+                absolute_iteration = network_output['iterations_per_epoch'] * epoch + i
+
+                if absolute_iteration % iteration_modulo == 0:
+                    network_output['loss_train'] = running_loss_train / \
+                        iteration_modulo
+                    network_output['loss_test'] = running_loss_test / \
+                        iteration_modulo
+
+                    # write to the report file
+                    for item in self._research_scheme:
+                        item.print(self._research_path, **network_output)
+
+                    running_loss_test = 0.0
+                    running_loss_train = 0.0
 
         # save the final model
         model_path = os.path.join(
@@ -144,6 +183,9 @@ if __name__ == "__main__":
     import torchvision.models as models
     import torchvision.transforms as transforms
     import torchvision
+
+    # items
+    from .research_items import ModelConfigurationItem, CurrentIterationItem, LossPrintItem, LossVisualizationItem
 
     # net specific stuff
     net = torchvision.models.MobileNetV2(num_classes=100).cuda()
