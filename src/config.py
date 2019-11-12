@@ -26,3 +26,6 @@ MAIN_PATH = 'main.py'
 # import only modules for
 # chosen implementation
 IMPORT_ALL = True
+
+
+MY_PRETRAINED_MODELS_PATH = 'models/my_pretrained'
