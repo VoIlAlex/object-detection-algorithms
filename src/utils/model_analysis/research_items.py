@@ -33,10 +33,15 @@ class CurrentIterationItem(ResearchItem):
         print_end = self._kwargs.get('print_end', '\n')
         internal_path = self._kwargs.get('internal_path', 'report.txt')
         iteration_modulo = self._kwargs.get('iteration_modulo', 1)
+        use_absolute_iteration = self._kwargs.get('absolute_iteration', False)
+        iterations_per_epoch = kwargs.get('iterations_per_epoch', None)
 
         # framework provided arguments
         epoch = kwargs.get('epoch', -1)
         iteration = kwargs.get('iteration', -1)
+
+        # absolute iterations count
+        absolute_iteration = iterations_per_epoch * epoch + iteration
 
         # get out if necessary
         if iteration % iteration_modulo != 0:
@@ -49,9 +54,17 @@ class CurrentIterationItem(ResearchItem):
         )
 
         # write item to the file
-        with open(file_path, 'a') as f:
-            print('Iteration: [{:6d},{:6d}]'.format(
-                epoch, iteration), file=f, end=print_end)
+        if use_absolute_iteration:
+            with open(file_path, 'a') as f:
+                print('Iteration: {:10d}'.format(absolute_iteration),
+                      file=f,
+                      end=print_end)
+        else:
+            with open(file_path, 'a') as f:
+                print('Iteration: [{:6d},{:6d}]'.format(
+                    epoch, iteration),
+                    file=f,
+                    end=print_end)
 
 
 class AccuracyPrintItem(ResearchItem):
@@ -69,6 +82,7 @@ class AccuracyPrintItem(ResearchItem):
         print_end = self._kwargs.get('print_end', '\n')
         internal_path = self._kwargs.get('internal_path', 'report.txt')
         iteration_modulo = self._kwargs.get('iteration_modulo', 1)
+        watch_test = self._kwargs.get('watch_test', False)
 
         # framework provided arguments
         iteration = kwargs.get('iteration', -1)
@@ -88,9 +102,14 @@ class AccuracyPrintItem(ResearchItem):
 
         # write item to the file
         with open(file_path, 'a') as f:
-            print('Accuracy: [{:6.2f},{:6.2f}] '.format(accuracy_train, accuracy_test),
-                  file=f,
-                  end=print_end)
+            if watch_test:
+                print('Accuracy: [{:6.2f},{:6.2f}] '.format(accuracy_train, accuracy_test),
+                      file=f,
+                      end=print_end)
+            else:
+                print('Accuracy: {:6.2f}'.format(accuracy_train),
+                      file=f,
+                      end=print_end)
 
 
 class LossPrintItem(ResearchItem):
@@ -108,6 +127,7 @@ class LossPrintItem(ResearchItem):
         print_end = self._kwargs.get('print_end', '\n')
         internal_path = self._kwargs.get('internal_path', 'report.txt')
         iteration_modulo = self._kwargs.get('iteration_modulo', 1)
+        watch_test = self._kwargs.get('watch_test', False)
 
         # framework provided arguments
         iteration = kwargs.get('iteration', -1)
@@ -126,25 +146,39 @@ class LossPrintItem(ResearchItem):
 
         # write item to the file
         with open(file_path, 'a') as f:
-            print('Loss: [{:6.2f},{:6.2f}] '.format(loss_train, loss_test),
-                  file=f,
-                  end=print_end)
+            if watch_test:
+                print('Loss: [{:6.2f},{:6.2f}] '.format(loss_train, loss_test),
+                      file=f,
+                      end=print_end)
+            else:
+                print('Loss: {:6.2f}'.format(loss_train),
+                      file=f,
+                      end=print_end)
 
 
 class LossVisualizationItem(ResearchItem):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, watch_test: bool = False, *args, **kwargs):
         self._args = args
         self._kwargs = kwargs
-        func_descriptors = [
-            {
-                'name': 'train',
-                'color': 'r'
-            },
-            {
-                'name': 'test',
-                'color': 'b'
-            }
-        ]
+        if watch_test is True:
+            func_descriptors = [
+                {
+                    'name': 'train',
+                    'color': 'r'
+                },
+                {
+                    'name': 'test',
+                    'color': 'b'
+                }
+            ]
+        else:
+            func_descriptors = [
+                {
+                    'name': 'train',
+                    'color': 'r'
+                }
+            ]
+        self._watch_test = watch_test
         self._visualizer = Visualizer(func_descriptors, 'Iterations', 'Loss')
 
     def print(self, research_path, *args, **kwargs):
@@ -164,22 +198,31 @@ class LossVisualizationItem(ResearchItem):
         # convert the loss
         # to the right format
         loss_train = loss_train.cpu().detach().numpy()
-        loss_test = loss_test.cpu().detach().numpy()
+        if self._watch_test:
+            loss_test = loss_test.cpu().detach().numpy()
 
         # absolute iteration
         x_pos = iterations_per_epoch * epoch + iteration
 
         if iteration % iteration_modulo == 0:
-            self._visualizer.update({
-                'train': {
-                    'x': x_pos,
-                    'y': loss_train
-                },
-                'test': {
-                    'x': x_pos,
-                    'y': loss_test
-                }
-            })
+            if self._watch_test is True:
+                self._visualizer.update({
+                    'train': {
+                        'x': x_pos,
+                        'y': loss_train
+                    },
+                    'test': {
+                        'x': x_pos,
+                        'y': loss_test
+                    }
+                })
+            else:
+                self._visualizer.update({
+                    'train': {
+                        'x': x_pos,
+                        'y': loss_train
+                    }
+                })
         self._visualizer.redraw()
 
 
