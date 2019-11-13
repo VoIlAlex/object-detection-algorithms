@@ -19,6 +19,8 @@ import torch
 import matplotlib.pyplot as plt
 
 
+# TODO: use kwargs from Research as SUPER kwargs. So they have more priority with regard of items' kwargs
+
 class Research:
     def __init__(self,
                  research_path: str,
@@ -41,12 +43,19 @@ class ModelResearch(Research):
                  research_scheme: list,
                  model,
                  optimizer,
-                 criterion):
+                 criterion,
+                 watch_test=None):
         Research.__init__(self, research_path, research_scheme)
         self._model = model
         self._optimizer = optimizer
         self._criterion = criterion
         self._use_cuda = next(model.parameters()).is_cuda
+        self._watch_test = watch_test
+
+        # it's used by research items
+        if watch_test is not None:
+            for item in self._research_scheme:
+                item._kwargs['watch_test'] = watch_test
 
         # save initial model
         internal_path = os.path.join(self._research_path, 'model_init.pth')
@@ -97,12 +106,29 @@ class ModelResearch(Research):
             'iterations_per_epoch': min(len(train_dataloader), len(test_dataloader))
         }
 
+        # TODO: here is too many `if self._watch_test:` conditions
+
+        # If only train is needed
+        if self._watch_test:
+            dataloaders = zip(train_dataloader, test_dataloader)
+        else:
+            dataloaders = train_dataloader
+            network_output['iterations_per_epoch'] = len(train_dataloader)
+
         # Main cycle
         running_loss_train = 0.0
-        running_loss_test = 0.0
+        if self._watch_test:
+            running_loss_test = 0.0
         # TODO: test dataloader has fewer number of samples than train dataloader
+
         for epoch in range(epochs):
-            for i, ((X_train, y_train), (X_test, y_test)) in enumerate(zip(train_dataloader, test_dataloader)):
+            for i, data in enumerate(dataloaders):
+
+                if self._watch_test:
+                    ((X_train, y_train), (X_test, y_test)) = data
+                else:
+                    (X_train, y_train) = data
+
                 network_output['iteration'] = i
                 network_output['epoch'] = epoch
                 network_output['input'] = X_train
@@ -111,27 +137,32 @@ class ModelResearch(Research):
                 if self._use_cuda:
                     X_train = X_train.cuda()
                     y_train = y_train.cuda()
-                    X_test = X_test.cuda()
-                    y_test = y_test.cuda()
+                    if self._watch_test:
+                        X_test = X_test.cuda()
+                        y_test = y_test.cuda()
 
                 # zero gradients of the parameters
                 self._optimizer.zero_grad()
 
                 # calculate the loss
                 y_pred = self._model(X_train)
-                y_pred_test = self._model(X_test)
+                if self._watch_test:
+                    y_pred_test = self._model(X_test)
 
                 if self._use_cuda:
                     y_pred = y_pred.cuda()
-                    y_pred_test = y_pred_test.cuda()
+                    if self._watch_test:
+                        y_pred_test = y_pred_test.cuda()
 
                 network_output['output'] = y_pred
 
                 loss_train = self._criterion(y_pred, y_train)
-                loss_test = self._criterion(y_pred_test, y_test)
+                if self._watch_test:
+                    loss_test = self._criterion(y_pred_test, y_test)
 
                 running_loss_train += loss_train
-                running_loss_test += loss_test
+                if self._watch_test:
+                    running_loss_test += loss_test
 
                 # backward propagation
                 loss_train.backward()
@@ -145,15 +176,18 @@ class ModelResearch(Research):
                 if absolute_iteration % iteration_modulo == 0:
                     network_output['loss_train'] = running_loss_train / \
                         iteration_modulo
-                    network_output['loss_test'] = running_loss_test / \
-                        iteration_modulo
+                    if self._watch_test:
+                        network_output['loss_test'] = running_loss_test / \
+                            iteration_modulo
 
                     # write to the report file
                     for item in self._research_scheme:
                         item.print(self._research_path, **network_output)
 
-                    running_loss_test = 0.0
                     running_loss_train = 0.0
+
+                    if self._watch_test:
+                        running_loss_test = 0.0
 
         # save the final model
         model_path = os.path.join(
