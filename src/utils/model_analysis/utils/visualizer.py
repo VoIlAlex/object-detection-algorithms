@@ -1,10 +1,12 @@
 import matplotlib
+matplotlib.use("TkAgg")
+
 import matplotlib.pyplot as plt
+plt.ion()
+
 import numpy as np
 import time
 
-matplotlib.use("TkAgg")
-plt.ion()
 
 __all__ = ['Visualizer']
 
@@ -37,7 +39,8 @@ class Visualizer:
         self.axes.set_xlabel(x_label)
         self.axes.set_ylabel(y_label)
         self.axes.autoscale(enable=True, axis='both')
-        self.funcs = {d['name']: Func(self.axes, d['color'], d['name']) for d in curves_descriptors}
+        self.funcs = {d['name']: Func(
+            self.axes, d['color'], d['name']) for d in curves_descriptors}
 
     def update(self, new_values: dict):
         for func_name in new_values:
@@ -57,7 +60,7 @@ if __name__ == '__main__':
     ]
     visualizer = Visualizer(funcs_descriptors, 'x_label', 'y_label')
 
-    rand = lambda: np.random.uniform(0, 10)
+    def rand(): return np.random.uniform(0, 10)
 
     for i in range(10):
         visualizer.update({
