@@ -107,6 +107,12 @@ class DefaultLabelParser(LabelParser):
             classes_count=classes_count
         )
 
+        # Permute labels to the right format
+        labels = labels.tolist()[0]
+        labels = labels[-4:] + labels[:-4]
+        labels = labels[:4] + [1.0] + labels[4:]
+        labels = np.array([labels])
+
         result_labels = None
 
         i = 0
@@ -126,7 +132,8 @@ class DefaultLabelParser(LabelParser):
         # make YOLO with arbitrary
         # output size.
         if i != max_bb_count:
-            extra_labels = np.ones(shape=(max_bb_count - i, classes_count + 4))
+            extra_labels = np.zeros(
+                shape=(max_bb_count - i, classes_count + 5))
             if result_labels is None:
                 result_labels = extra_labels
             else:
