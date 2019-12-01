@@ -4,6 +4,7 @@ from .utils import Visualizer
 # Different types of research
 from .research import Research
 from .research import ModelResearch
+from .research import ResearchSession
 
 # Research items
 from .research_items import ResearchItem
