@@ -17,9 +17,11 @@
 import os
 import torch
 import matplotlib.pyplot as plt
-
+import importlib
+from ..path_generation import ModelPathGenerator
 
 # TODO: use kwargs from Research as SUPER kwargs. So they have more priority with regard of items' kwargs
+
 
 class Research:
     def __init__(self,
@@ -61,7 +63,7 @@ class ModelResearch(Research):
         internal_path = os.path.join(self._research_path, 'model_init.pth')
         torch.save(self._model.state_dict(), internal_path)
 
-    def start_research_session(self, train_dataloader, test_dataloader=None, epochs=1, iteration_modulo=None):
+    def start_research_session(self, train_dataloader, test_dataloader=None, epochs=1, iteration_modulo=None, **kwargs):
         """
 
         Arguments:
@@ -194,7 +196,47 @@ class ModelResearch(Research):
             self._research_path,
             'model.pth'
         )
-        torch.save(self._model.parameters(), model_path)
+        torch.save(self._model.state_dict(), model_path)
+
+
+class ResearchSession:
+    def __init__(self, config_module: str, root_path: str):
+        self._config_module = config_module
+        self._root_path = root_path
+
+    def start_research_session(self):
+        # here we process a banach of
+        # models written in config files
+        research_list = self.__parse_config_file()
+        for (research, kwargs) in research_list:
+            research.start_research_session(**kwargs)
+
+    def __parse_config_file(self):
+        # importlib.reload(self._config_module)
+        research_list = []
+        for session_description in self._config_module.RESEARCH_SESSION_CONFIG:
+            session_kwargs = session_description['session']
+            construct_kwargs = session_description['construction']
+
+            # Generate research path name
+            path_generator = ModelPathGenerator(
+                root_path=self._root_path
+            )
+            research_path = path_generator.generate_path(
+                model=construct_kwargs['model'],
+                optimizer=construct_kwargs['optimizer'],
+                criterion=construct_kwargs['criterion'],
+                epochs=session_kwargs['epochs'],
+                dataset_name=session_kwargs.get('dataset_name', None),
+                lr=session_kwargs.get('lr_in_path', True),
+                batch_size=session_kwargs.get('batch_size', None),
+                makedirs=True
+            )
+
+            research = ModelResearch(
+                research_path=research_path, **construct_kwargs)
+            research_list.append((research, session_kwargs))
+        return research_list
 
 
 class ModelsComparison(Research):
