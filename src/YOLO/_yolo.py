@@ -181,7 +181,7 @@ class YOLO_keras(ObjectDetectionNet):
 
 
 class YOLO_pytorch(nn.Module, ObjectDetectionNet):
-    def __init__(self):
+    def __init__(self, B=2, S=7, C=20):
         # call parents' constructors
         nn.Module.__init__(self)
         ObjectDetectionNet.__init__(self)
@@ -368,9 +368,8 @@ class YOLO_pytorch(nn.Module, ObjectDetectionNet):
         # Block 8
         self.l22 = nn.Linear(
             in_features=4096,
-            out_features=1470
-        )
-        self.final_reshape = View(30, 7, 7)
+            out_features=(B * 5 + C) * S * S)
+        self.final_reshape = View(B * 5 + C, S, S)
 
     def forward(self, x):
         for i, m in enumerate(self.modules()):
