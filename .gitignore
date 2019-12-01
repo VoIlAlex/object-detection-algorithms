@@ -14,3 +14,7 @@ data/
 !data/references.json
 !data/references.py
 !data/config/
+
+# Log files
+*output*.txt
+report.txt
