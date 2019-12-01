@@ -38,16 +38,23 @@ class ModelPathGenerator(PathGenerator):
                       criterion=None,
                       epochs: int = None,
                       dataset_name: str = None,
-                      makedirs=False):
+                      lr: bool = False,
+                      batch_size: int = None,
+                      makedirs=False, **kwargs):
         path = model.__class__.__name__
         if optimizer is not None:
             path += '_' + optimizer.__class__.__name__
+            if lr is True:
+                # part of learning rate after '.'
+                path += str(optimizer.defaults['lr']).split('.')[1]
         if criterion is not None:
             path += '_' + criterion.__class__.__name__
         if epochs is not None:
             path += '_' + str(epochs) + 'ep'
         if dataset_name is not None:
             path += '_' + dataset_name
+        if batch_size is not None:
+            path += '_b' + str(batch_size)
 
         path = os.path.join(self._root_path, path)
 
