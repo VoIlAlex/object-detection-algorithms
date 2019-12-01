@@ -192,12 +192,12 @@ class YOLO_pytorch(nn.Module, ObjectDetectionNet):
             out_channels=64,
             kernel_size=(7, 7),
             stride=2,
-            padding=3
-        )
+            padding=3,
+        ).type(torch.float16)
         self.l2 = nn.MaxPool2d(
             kernel_size=(2, 2),
             stride=2
-        )
+        ).type(torch.float16)
 
         # Block 2
         self.l3 = nn.Conv2d(
@@ -205,144 +205,144 @@ class YOLO_pytorch(nn.Module, ObjectDetectionNet):
             out_channels=192,
             kernel_size=(3, 3),
             padding=1
-        )
+        ).type(torch.float16)
         self.l4 = nn.MaxPool2d(
             kernel_size=(2, 2),
             stride=2
-        )
+        ).type(torch.float16)
 
         # Block 3
         self.l5 = nn.Conv2d(
             in_channels=192,
             out_channels=128,
             kernel_size=(1, 1)
-        )
+        ).type(torch.float16)
         self.l6 = nn.Conv2d(
             in_channels=128,
             out_channels=256,
             kernel_size=(3, 3),
             padding=1
-        )
+        ).type(torch.float16)
         self.l7 = nn.Conv2d(
             in_channels=256,
             out_channels=256,
             kernel_size=(1, 1)
-        )
+        ).type(torch.float16)
         self.l8 = nn.Conv2d(
             in_channels=256,
             out_channels=512,
             kernel_size=(3, 3),
             padding=1
-        )
+        ).type(torch.float16)
 
         self.l9 = nn.MaxPool2d(
             kernel_size=(2, 2),
             stride=2
-        )
+        ).type(torch.float16)
 
         # Block 4
         self.l10_1 = nn.Conv2d(
             in_channels=512,
             out_channels=256,
             kernel_size=(1, 1)
-        )
+        ).type(torch.float16)
         self.l11_1 = nn.Conv2d(
             in_channels=256,
             out_channels=512,
             kernel_size=(3, 3),
             padding=1
-        )
+        ).type(torch.float16)
 
         self.l10_2 = nn.Conv2d(
             in_channels=512,
             out_channels=256,
             kernel_size=(1, 1)
-        )
+        ).type(torch.float16)
         self.l11_2 = nn.Conv2d(
             in_channels=256,
             out_channels=512,
             kernel_size=(3, 3),
             padding=1
-        )
+        ).type(torch.float16)
 
         self.l10_3 = nn.Conv2d(
             in_channels=512,
             out_channels=256,
             kernel_size=(1, 1)
-        )
+        ).type(torch.float16)
         self.l11_3 = nn.Conv2d(
             in_channels=256,
             out_channels=512,
             kernel_size=(3, 3),
             padding=1
-        )
+        ).type(torch.float16)
 
         self.l10_4 = nn.Conv2d(
             in_channels=512,
             out_channels=256,
             kernel_size=(1, 1)
-        )
+        ).type(torch.float16)
         self.l11_4 = nn.Conv2d(
             in_channels=256,
             out_channels=512,
             kernel_size=(3, 3),
             padding=1
-        )
+        ).type(torch.float16)
 
         self.l12 = nn.Conv2d(
             in_channels=512,
             out_channels=512,
             kernel_size=(1, 1)
-        )
+        ).type(torch.float16)
         self.l13 = nn.Conv2d(
             in_channels=512,
             out_channels=1024,
             kernel_size=(3, 3),
             padding=1
-        )
+        ).type(torch.float16)
         self.l14 = nn.MaxPool2d(
             kernel_size=(2, 2),
             stride=2
-        )
+        ).type(torch.float16)
 
         # Block 5
         self.l15_1 = nn.Conv2d(
             in_channels=1024,
             out_channels=512,
             kernel_size=(1, 1)
-        )
+        ).type(torch.float16)
         self.l16_1 = nn.Conv2d(
             in_channels=512,
             out_channels=1024,
             kernel_size=(3, 3),
             padding=1
-        )
+        ).type(torch.float16)
 
         self.l15_2 = nn.Conv2d(
             in_channels=1024,
             out_channels=512,
             kernel_size=(1, 1)
-        )
+        ).type(torch.float16)
         self.l16_2 = nn.Conv2d(
             in_channels=512,
             out_channels=1024,
             kernel_size=(3, 3),
             padding=1
-        )
+        ).type(torch.float16)
 
         self.l17 = nn.Conv2d(
             in_channels=1024,
             out_channels=1024,
             kernel_size=(3, 3),
             padding=1
-        )
+        ).type(torch.float16)
         self.l18 = nn.Conv2d(
             in_channels=1024,
             out_channels=1024,
             kernel_size=(3, 3),
             stride=2,
             padding=1
-        )
+        ).type(torch.float16)
 
         # Block 6
         self.l19 = nn.Conv2d(
@@ -350,25 +350,26 @@ class YOLO_pytorch(nn.Module, ObjectDetectionNet):
             out_channels=1024,
             kernel_size=(3, 3),
             padding=1
-        )
+        ).type(torch.float16)
         self.l20 = nn.Conv2d(
             in_channels=1024,
             out_channels=1024,
             kernel_size=(3, 3),
             padding=1
-        )
+        ).type(torch.float16)
 
         # Block 7
         self.flat = nn.Flatten()
         self.l21 = nn.Linear(
             in_features=50176,
             out_features=4096
-        )
+        ).type(torch.float16)
 
         # Block 8
         self.l22 = nn.Linear(
             in_features=4096,
-            out_features=(B * 5 + C) * S * S)
+            out_features=(B * 5 + C) * S * S
+        ).type(torch.float16)
         self.final_reshape = View(B * 5 + C, S, S)
 
     def forward(self, x):
