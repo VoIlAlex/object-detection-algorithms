@@ -31,14 +31,14 @@ class ModelPathGenerator(PathGenerator):
     """Generates path to folder for a model."""
 
     def generate_path(self,
-                      model,
+                      model, *args,
                       optimizer=None,
                       criterion=None,
                       epochs: int = None,
                       dataset_name: str = None,
                       lr: bool = False,
                       batch_size: int = None,
-                      makedirs=False, *args, **kwargs):
+                      makedirs=False, **kwargs):
         path = model.__class__.__name__
         if optimizer is not None:
             path += '_' + optimizer.__class__.__name__
