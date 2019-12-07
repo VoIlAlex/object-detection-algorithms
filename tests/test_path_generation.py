@@ -53,3 +53,18 @@ class TestPathGeneration:
             generated_path = path_generator.generate_path()
         except TypeError:
             pass
+
+    def test_args_chaining(self):
+        class Model():
+            pass
+
+        path_generator = ModelPathGenerator('models')
+        generated_path = path_generator.generate_path(
+            Model(), 'hello', 'world'
+        )
+        expected_path = os.path.join(
+            'models',
+            Model().__class__.__name__ + '_hello_world'
+        )
+
+        assert generated_path == expected_path
