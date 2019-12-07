@@ -1,7 +1,7 @@
-"""
+"""Module for path generation.
 
 Note: I need some tools to generate
-paths. e.g. to generate paths for 
+paths. e.g. to generate paths for
 researches for differnet models.
 """
 
@@ -28,9 +28,7 @@ class DefaultPathGenerator(PathGenerator):
 
 
 class ModelPathGenerator(PathGenerator):
-    """Generates path to folder for model 
-    log files.
-    """
+    """Generates path to folder for a model."""
 
     def generate_path(self,
                       model,
