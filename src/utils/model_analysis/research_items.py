@@ -1,34 +1,63 @@
+"""Collection of items to be used ass building blocks for research."""
 import os
 from .utils import Visualizer
+import matplotlib.pyplot as plt
 
 
 class ResearchItem:
-    """Base class for all the research
-    items.
+    """Base class for all the research items.
+
+    Each derived class of ResearchItem works like
+    a filter. Processing application passes all the
+    session information (iteration, accuracy, etc.),
+    and each Item gets only stuff relevant to its purpose.
+    Then it prints generated report string to the 
+    specified report file.
     """
 
-    def print(self, research_path, *args, **kwargs):
+    def print(self, research_path: str, *args, **kwargs):
+        """Print result of an item to the specified report file.
+
+        Arguments:
+            research_path {str} -- path to the reseach folder.
+
+        Raises:
+            NotImplementedError: This method is a base class. 
+            This method should be implemented by each component separately.
+
+        """
         raise NotImplementedError(
             'print(...) method should be implemented '
-            'by all the childs of ResearchItem class'
+            'by all the children of ResearchItem class'
         )
 
     def final_action(self, research_path, *args, **kwargs):
+        """
+
+        Arguments:
+            research_path {[type]} -- [description]
+        """
         # TODO: Add final action support for items
-        None
+
+        pass
 
 
 class CurrentIterationItem(ResearchItem):
+    """Item to deal with current iteration of processing."""
+
     def __init__(self, *args, **kwargs):
+        """Save args and kwargs for later use."""
         self._args = args
         self._kwargs = kwargs
 
-    def print(self, research_path, *args, **kwargs):
+    def print(self, research_path: str, *args, **kwargs):
+        """Print currect iteration to the research file.
 
-        #
-        # extract arguments
-        #
+        Arguments:
+            research_path {str} -- path to research folder with reports.
 
+        """
+        # # Extract arguments
         # user provided arguments
         print_end = self._kwargs.get('print_end', '\n')
         internal_path = self._kwargs.get('internal_path', 'report.txt')
@@ -68,16 +97,21 @@ class CurrentIterationItem(ResearchItem):
 
 
 class AccuracyPrintItem(ResearchItem):
+    """Item to deal with accuracy of a model."""
+
     def __init__(self, *args, **kwargs):
+        """Save args and kwargs for later use."""
         self._args = args
         self._kwargs = kwargs
 
     def print(self, research_path, *args, **kwargs):
+        """Print accuracy to the research file.
 
-        #
-        # extract arguments
-        #
+        Arguments:
+            research_path {str} -- path to research folder with reports.
 
+        """
+        # # Extract arguments
         # user provided arguments
         print_end = self._kwargs.get('print_end', '\n')
         internal_path = self._kwargs.get('internal_path', 'report.txt')
@@ -113,16 +147,21 @@ class AccuracyPrintItem(ResearchItem):
 
 
 class LossPrintItem(ResearchItem):
+    """Item to deal with loss of a training/testing."""
+
     def __init__(self, *args, **kwargs):
+        """Save args and kwargs for later use."""
         self._args = args
         self._kwargs = kwargs
 
     def print(self, research_path, *args, **kwargs):
+        """Print loss of training/testing to the research file.
 
-        #
-        # extract arguments
-        #
+        Arguments:
+            research_path {str} -- path to research folder with reports.
 
+        """
+        # # Extract arguments
         # user provided arguments
         print_end = self._kwargs.get('print_end', '\n')
         internal_path = self._kwargs.get('internal_path', 'report.txt')
@@ -157,7 +196,16 @@ class LossPrintItem(ResearchItem):
 
 
 class LossVisualizationItem(ResearchItem):
-    def __init__(self, watch_test: bool = False, *args, **kwargs):
+    """Item to deal with visualization of the training/testing loss of a model."""
+
+    def __init__(self, watch_test: bool = False, img_name: str = 'loss_rate.png', *args, **kwargs):
+        """Save args and kwargs for later use.
+
+        Arguments:
+            watch_test {bool} -- whether to plot testing loss.
+            img_name {str} -- name of the image to save plot to.
+
+        """
         self._args = args
         self._kwargs = kwargs
         if watch_test is True:
@@ -180,12 +228,23 @@ class LossVisualizationItem(ResearchItem):
             ]
         self._watch_test = watch_test
         self._visualizer = Visualizer(func_descriptors, 'Iterations', 'Loss')
+        self._research_path = 'loss_rate.png'
+        self._img_name = img_name
 
     def print(self, research_path, *args, **kwargs):
+        """Save plot to the research folder and update plot state.
 
+        Arguments:
+            research_path {str} -- path to research folder with reports.
+
+        """
+        # ? Why do I save research path to self ?
+        self._research_path = research_path
+        # # Extract arguments
         # user provided arguments
         print_end = self._kwargs.get('print_end', '\n')
-        internal_path = self._kwargs.get('internal_path', 'report.txt')
+        internal_path = self._kwargs.get(
+            'internal_path', 'report.txt')
         iteration_modulo = self._kwargs.get('iteration_modulo', 1)
 
         # framework provided arguments
@@ -227,15 +286,21 @@ class LossVisualizationItem(ResearchItem):
 
 
 class ModelConfigurationItem(ResearchItem):
+    """Item to deal with configuration of a model."""
+
     def __init__(self, *args, **kwargs):
+        """Save args and kwargs for later use."""
         self._args = args
         self._kwargs = kwargs
 
     def print(self, research_path, *args, **kwargs):
-        #
-        # extract arguments
-        #
+        """Print accuracy to the research file.
 
+        Arguments:
+            research_path {str} -- path to research folder with reports.
+
+        """
+        # # Extract arguments
         # user provided arguments
         print_end = self._kwargs.get('print_end', '\n')
         internal_path = self._kwargs.get('internal_path', 'report.txt')
