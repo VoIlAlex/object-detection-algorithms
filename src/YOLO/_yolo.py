@@ -400,31 +400,30 @@ class YOLO_pytorch(nn.Module, ObjectDetectionNet):
         # TODO: YOLO_torch evaluation with generator
         pass
 
-    def fit_generator(self, generator, validation_data):
-        # TODO: YOLO_torch fitting  with generator
-        criterion = torch.nn.MSELoss().cuda()
+    def fit_generator(self, generator, validation_data, cuda=None):
+        if cuda is None:
+            cuda = torch.cuda.is_available()
+
+        criterion = torch.nn.MSELoss().cuda() if cuda is True else torch.nnMSELoss()
+
         optimizer = torch.optim.SGD(
             self.parameters(), lr=0.001, momentum=0.9)
 
+        if cuda is True:
+            criterion = criterion.cuda()
+            self.cuda()
+
         for i, (X, y) in enumerate(generator):
             X = torch.from_numpy(X).permute(
-                0, 3, 1, 2).type(torch.float16).cuda()
-            y = torch.from_numpy(y).type(torch.float16).cuda()
+                0, 3, 1, 2).type(self.dtype)
+            y = torch.from_numpy(y).type(self.dtype)
+            y = y.permute(0, 2, 1).reshape(8, 85, 10, 10)
 
-            # preprocess output
-            y = y.cpu().permute(0, 2, 1).reshape(8, 85, 10, 10).cuda()
+            if cuda is True:
+                X = X.cuda()
+                y = y.cuda()
 
-            # Here I'm trying to
-            # process
-            for m in self.children():
-                m.cuda()
-                X_old = X
-                X = m(X)
-                del X_old
-                m.cpu()
-                torch.cuda.empty_cache()
-
-            y_pred = X
+            y_pred = self(X)
 
             loss = criterion(y_pred, y)
             loss.backward()
@@ -434,6 +433,9 @@ class YOLO_pytorch(nn.Module, ObjectDetectionNet):
 
             if i % 99 == 100:
                 print('Loss is {}'.format(loss))
+
+        if cuda is True:
+            self.cpu()
 
 
 # Choosing an implementation
