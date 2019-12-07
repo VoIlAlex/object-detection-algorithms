@@ -38,7 +38,7 @@ class ModelPathGenerator(PathGenerator):
                       dataset_name: str = None,
                       lr: bool = False,
                       batch_size: int = None,
-                      makedirs=False, **kwargs):
+                      makedirs=False, *args, **kwargs):
         path = model.__class__.__name__
         if optimizer is not None:
             path += '_' + optimizer.__class__.__name__
@@ -53,6 +53,10 @@ class ModelPathGenerator(PathGenerator):
             path += '_' + dataset_name
         if batch_size is not None:
             path += '_b' + str(batch_size)
+
+        # Process positional arguments
+        for path_item in args:
+            path += '_' + str(path_item)
 
         path = os.path.join(self._root_path, path)
 
