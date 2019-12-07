@@ -68,3 +68,9 @@ class TestPathGeneration:
         )
 
         assert generated_path == expected_path
+
+    def test_model_name_from_file_name(self):
+        file_name = 'Model1_blahblah'
+        model_name = ModelPathGenerator.get_model_name(file_name)
+        expected_model_name = 'Model1'
+        assert model_name == expected_model_name
