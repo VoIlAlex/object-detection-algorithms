@@ -1,10 +1,12 @@
-IMAGE_SHAPE = (448, 448, 3)  # shape of input image
-CELL_SIZE = 7  # size of cell
-BOXES_PER_CELL = 2  # number of boxes per cell
+YOLO_DEFAULT_IMAGE_SHAPE = (448, 448, 3)  # shape of input image
+YOLO_DEFAULT_CELL_SIZE = 7  # size of cell in the grid
+YOLO_DEFAULT_BOXES_PER_CELL = 2  # number of boxes per cell
+
 
 # This constant is used
 # throughout label parsing
-MAX_BB_COUNT = 100  # max count of bounding boxes
+COCO_MAX_BB_COUNT = 100  # max count of bounding boxes
+
 
 # Select from [pytorch, tensorflow, keras, theano]
 FRAMEWORK_TO_USE = 'pytorch'
