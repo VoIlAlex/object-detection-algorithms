@@ -187,6 +187,9 @@ class YOLO_pytorch(nn.Module, ObjectDetectionNet):
         nn.Module.__init__(self)
         ObjectDetectionNet.__init__(self)
         self.dtype = dtype
+        self.B = B
+        self.S = S
+        self.C = C
 
         # Block 1
         self.l1 = nn.Conv2d(
@@ -400,7 +403,7 @@ class YOLO_pytorch(nn.Module, ObjectDetectionNet):
         # TODO: YOLO_torch evaluation with generator
         pass
 
-    def fit_generator(self, generator, validation_data, cuda=None):
+    def fit_generator(self, generator, validation_data, cuda=None, channels_first=False):
         if cuda is None:
             cuda = torch.cuda.is_available()
 
@@ -417,7 +420,9 @@ class YOLO_pytorch(nn.Module, ObjectDetectionNet):
             X = torch.from_numpy(X).permute(
                 0, 3, 1, 2).type(self.dtype)
             y = torch.from_numpy(y).type(self.dtype)
-            y = y.permute(0, 2, 1).reshape(8, 85, 10, 10)
+            if not channels_first:
+                y = y.permute(0, 2, 1)
+            y.reshape(y.shape[0], 5 * self.B + self.C, self.S, self.S)
 
             if cuda is True:
                 X = X.cuda()
