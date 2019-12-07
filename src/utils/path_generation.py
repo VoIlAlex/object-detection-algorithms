@@ -64,6 +64,10 @@ class ModelPathGenerator(PathGenerator):
             os.makedirs(path)
         return path
 
+    @staticmethod
+    def get_model_name(file_name: str) -> str:
+        return file_name.split('_')[0]
+
 
 if __name__ == "__main__":
     import torch
