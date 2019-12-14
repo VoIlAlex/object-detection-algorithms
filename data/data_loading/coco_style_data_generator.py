@@ -82,7 +82,7 @@ class CocoStyleDataGenerator(Sequence):
 
         # max number of bounding
         # boxes in the image
-        self._max_bb_count = cfg.MAX_BB_COUNT
+        self._max_bb_count = cfg.COCO_MAX_BB_COUNT
 
         # the parsers might be
         # customized.
