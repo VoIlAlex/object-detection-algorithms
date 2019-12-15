@@ -121,20 +121,21 @@ class CocoStyleDataGenerator(Sequence):
         self.on_epoch_end()
 
     def __len__(self):
-        """Denotes the number of batches per epoch
+        """Denotes the number of batches per epoch.
 
         Returns:
             int -- number of batches per epoch
+
         """
         return len(self._image_names) // self._batch_size
 
     def __getitem__(self, index):
-        """Generate one batch of data
+        """Generate one batch of data.
 
         Arguments:
-            index {int} -- index of the batch
-        """
+            index {int} -- index of the 
 
+        """
         # Generate indexes of the batch
         indexes = self._indexes[
             index * self._batch_size:(index + 1) * self._batch_size
