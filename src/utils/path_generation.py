@@ -70,8 +70,8 @@ class ModelPathGenerator(PathGenerator):
                       lr: bool = False,
                       batch_size: int = None,
                       makedirs=False,
-                      session=0,
-                      **kwargs) -> str:
+                      session=None
+                      ** kwargs) -> str:
         """Generate path for the model report.
 
         Arguments:
@@ -105,6 +105,8 @@ class ModelPathGenerator(PathGenerator):
             path += '_' + dataset_name
         if batch_size is not None:
             path += '_b' + str(batch_size)
+        if session is not None:
+            path += '_s' + str(session)
 
         # Process positional arguments
         for path_item in args:
