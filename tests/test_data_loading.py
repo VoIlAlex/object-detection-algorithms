@@ -218,3 +218,63 @@ class TestDataLoading:
             )
             X = test_generator[0]
             assert X.shape == (32, 448, 448, 3)
+
+    @allow_MoyaPizama_constrains
+    class TestVOCLoading:
+
+        @MoyaPizama_specific_method
+        def test_voc_dataset_loading(self):
+            test_generator = VOCDataGenerator(
+                images_dir=DATASETS['voc']['images_dir'],
+                label_txt="data/labels/voc2007.txt",
+                image_shape=(448, 448, 3),
+                grid_size=7,
+                max_bb_count=2,
+                num_classes=20,
+                to_fit=False
+            )
+
+        @MoyaPizama_specific_method
+        def test_voc_dataset_get_item(self):
+            train_dataset = VOCDataGenerator(
+                images_dir=DATASETS['voc']['images_dir'],
+                label_txt="data/labels/voc2007.txt",
+                image_shape=(448, 448, 3),
+                grid_size=7,
+                max_bb_count=2,
+                num_classes=20,
+                to_fit=True
+            )
+            data = train_dataset[0]
+
+            pass
+
+        @MoyaPizama_specific_method
+        def test_voc_dataset_input_shape(self):
+            train_dataset = VOCDataGenerator(
+                images_dir=DATASETS['voc']['images_dir'],
+                label_txt="data/labels/voc2007.txt",
+                image_shape=(400, 400, 3),
+                grid_size=7,
+                max_bb_count=2,
+                num_classes=20,
+                to_fit=True
+            )
+            X, y = train_dataset[0]
+            assert X.shape[0] == 3
+            assert X.shape[1] == 400
+            assert X.shape[2] == 400
+
+        @MoyaPizama_specific_method
+        def test_voc_dataset_output_shape(self):
+            train_dataset = VOCDataGenerator(
+                images_dir=DATASETS['voc']['images_dir'],
+                label_txt="data/labels/voc2007.txt",
+                image_shape=(400, 400, 3),
+                grid_size=7,
+                max_bb_count=2,
+                num_classes=20,
+                to_fit=True
+            )
+            X, y = train_dataset[0]
+            assert y.shape == (7, 7, 30)
