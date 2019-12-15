@@ -10,5 +10,8 @@
             "labels": "/home/voilalex/Documents/coco/labels/val2014"
         },
         "names": "/home/voilalex/Documents/coco/coco.names"
+    },
+    "voc": {
+        "images_dir": "/home/voilalex/data/VOCdevkit/VOC2007/JPEGImages"
     }
 }
