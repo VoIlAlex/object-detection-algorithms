@@ -1,5 +1,3 @@
-# TODO: script to revert research
-
 import os
 import shutil
 

@@ -5,3 +5,4 @@ util stuff of the project in one place.
 
 from .testutils import *
 from .layers import *
+# from .model_analysis import *

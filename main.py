@@ -3,7 +3,7 @@
 """
 
 from src import *
-from data.data_loading import VOCDataGenerator
+from data.data_loading import VOCDataGenerator, VOCDataBatchGenerator
 from data.references import DATASETS
 import torch
 from src.utils.path_generation import ModelPathGenerator
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     #     names_path=DATASETS['coco']['names']
     # )
 
-    train_generator = VOCDataGenerator(
+    train_generator = VOCDataBatchGenerator(
         images_dir=DATASETS['voc']['images_dir'],
         label_txt="data/labels/voc2007.txt",
         image_shape=(448, 448, 3),
@@ -31,7 +31,7 @@ if __name__ == "__main__":
         to_fit=True
     )
 
-    test_generator = VOCDataGenerator(
+    test_generator = VOCDataBatchGenerator(
         images_dir=DATASETS['voc']['images_dir'],
         label_txt="data/labels/voc2007.txt",
         image_shape=(448, 448, 3),
@@ -45,7 +45,8 @@ if __name__ == "__main__":
     model.fit_generator(
         generator=train_generator,
         validation_data=test_generator,
-        channels_first=True
+        channels_first=True,
+        cuda=False
     )
 
     path_generator = ModelPathGenerator(config.MY_PRETRAINED_MODELS_PATH)

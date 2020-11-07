@@ -9,7 +9,11 @@ __pycache__/
 # Data
 *.weights
 *.pth
-data/
+data/datasets/
+data/labels/
+data/config/
+data/references.json
+data/references.py
 !data/data_loading/
 !data/references.json
 !data/references.py

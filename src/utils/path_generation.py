@@ -70,7 +70,7 @@ class ModelPathGenerator(PathGenerator):
                       lr: bool = False,
                       batch_size: int = None,
                       makedirs=False,
-                      session=None
+                      session=None,
                       ** kwargs) -> str:
         """Generate path for the model report.
 

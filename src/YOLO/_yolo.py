@@ -407,7 +407,7 @@ class YOLO_pytorch(nn.Module, ObjectDetectionNet):
         if cuda is None:
             cuda = torch.cuda.is_available()
 
-        criterion = torch.nn.MSELoss().cuda() if cuda is True else torch.nnMSELoss()
+        criterion = torch.nn.MSELoss().cuda() if cuda is True else torch.nn.MSELoss()
 
         optimizer = torch.optim.SGD(
             self.parameters(), lr=0.001, momentum=0.9)
